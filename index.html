@@ -633,7 +633,7 @@ async function generate() {
   const apiKey = INJECTED_API_KEY;
   const prompt  = document.getElementById('prompt').value.trim();
 
-  if (!apiKey || apiKey === '%%ANTHROPIC_API_KEY%%') {
+  if (!apiKey || apiKey.startsWith('%%')) {
     setStatus('❌ API-nøgle er ikke konfigureret (kontakt administrator)', 'error');
     return;
   }
