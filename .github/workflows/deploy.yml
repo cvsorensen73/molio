@@ -23,14 +23,24 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Check secret is available
+        run: |
+          if [ -z "${{ secrets.ANTHROPIC_API_KEY }}" ]; then
+            echo "ERROR: ANTHROPIC_API_KEY secret is empty or not set!"
+            exit 1
+          else
+            echo "Secret is set (length: $(echo -n '${{ secrets.ANTHROPIC_API_KEY }}' | wc -c))"
+          fi
+
       - name: Inject API key
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
-          echo "API key set: ${{ secrets.ANTHROPIC_API_KEY != '' }}"
-          echo "Placeholder present before injection: $(grep -c '%%ANTHROPIC_API_KEY%%' index.html || true)"
+          echo "=== Before injection ==="
+          grep -n 'ANTHROPIC_API_KEY' index.html
           python3 -c "import os; k=os.environ['ANTHROPIC_API_KEY']; print('Key length:', len(k)); c=open('index.html').read(); replaced=c.replace('%%ANTHROPIC_API_KEY%%',k); open('index.html','w').write(replaced); print('Placeholder count after:', replaced.count('%%ANTHROPIC_API_KEY%%'))"
-          echo "Injection step done"
+          echo "=== After injection ==="
+          grep -n 'ANTHROPIC_API_KEY' index.html
 
       - uses: actions/configure-pages@v5
 
