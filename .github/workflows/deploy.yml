@@ -27,7 +27,10 @@ jobs:
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
-          python3 -c "import os; k=os.environ['ANTHROPIC_API_KEY']; c=open('index.html').read(); open('index.html','w').write(c.replace('%%ANTHROPIC_API_KEY%%',k)); print('Injection ok:', '%%ANTHROPIC_API_KEY%%' not in c)"
+          echo "API key set: ${{ secrets.ANTHROPIC_API_KEY != '' }}"
+          echo "Placeholder present before injection: $(grep -c '%%ANTHROPIC_API_KEY%%' index.html || true)"
+          python3 -c "import os; k=os.environ['ANTHROPIC_API_KEY']; print('Key length:', len(k)); c=open('index.html').read(); replaced=c.replace('%%ANTHROPIC_API_KEY%%',k); open('index.html','w').write(replaced); print('Placeholder count after:', replaced.count('%%ANTHROPIC_API_KEY%%'))"
+          echo "Injection step done"
 
       - uses: actions/configure-pages@v5
 
