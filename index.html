@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MOLIO Filnavngenerator</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blue:      #1d6fa4;
+      --blue-dark: #155680;
+      --blue-bg:   #e8f4fb;
+      --green:     #276749;
+      --green-bg:  #f0fff4;
+      --green-bd:  #68d391;
+      --red:       #c53030;
+      --red-bg:    #fff5f5;
+      --red-bd:    #fc8181;
+      --yellow-bg: #fffbeb;
+      --yellow-bd: #f6d860;
+      --gray-100:  #f7fafc;
+      --gray-200:  #edf2f7;
+      --gray-300:  #e2e8f0;
+      --gray-500:  #a0aec0;
+      --gray-600:  #718096;
+      --gray-700:  #4a5568;
+      --gray-800:  #2d3748;
+      --gray-900:  #1a202c;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f0f4f8;
+      color: var(--gray-800);
+      min-height: 100vh;
+      padding: 16px;
+    }
+
+    .container { max-width: 760px; margin: 0 auto; }
+
+    /* ── Header ── */
+    header {
+      text-align: center;
+      padding: 36px 0 28px;
+    }
+    header .logo {
+      font-size: 2.6rem;
+      margin-bottom: 10px;
+    }
+    header h1 {
+      font-size: 1.7rem;
+      font-weight: 700;
+      color: var(--gray-900);
+      letter-spacing: -0.5px;
+      margin-bottom: 6px;
+    }
+    header p {
+      color: var(--gray-600);
+      font-size: 0.95rem;
+    }
+
+    /* ── Cards ── */
+    .card {
+      background: #fff;
+      border-radius: 14px;
+      padding: 24px;
+      margin-bottom: 18px;
+      box-shadow: 0 1px 4px rgba(0,0,0,.06), 0 4px 16px rgba(0,0,0,.04);
+    }
+    .card-title {
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--gray-500);
+      margin-bottom: 16px;
+    }
+
+    /* ── Form elements ── */
+    .form-group { margin-bottom: 14px; }
+    .form-group:last-child { margin-bottom: 0; }
+
+    label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--gray-700);
+      margin-bottom: 5px;
+    }
+
+    input[type="text"],
+    input[type="password"],
+    textarea {
+      width: 100%;
+      padding: 10px 13px;
+      border: 1.5px solid var(--gray-300);
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-family: inherit;
+      color: var(--gray-800);
+      background: #fff;
+      transition: border-color .15s, box-shadow .15s;
+      outline: none;
+    }
+    input:focus, textarea:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(29,111,164,.12);
+    }
+    textarea {
+      min-height: 90px;
+      resize: vertical;
+      line-height: 1.5;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 8px;
+      align-items: stretch;
+    }
+    .input-row input { flex: 1; }
+
+    /* ── Buttons ── */
+    button {
+      border: none;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      transition: background .15s, transform .1s;
+    }
+    button:active { transform: scale(.98); }
+
+    .btn-primary {
+      display: block;
+      width: 100%;
+      padding: 13px;
+      font-size: 1rem;
+      background: var(--blue);
+      color: #fff;
+      letter-spacing: 0.02em;
+    }
+    .btn-primary:hover:not(:disabled) { background: var(--blue-dark); }
+    .btn-primary:disabled { background: var(--gray-500); cursor: not-allowed; transform: none; }
+
+    .btn-sm {
+      padding: 9px 14px;
+      background: var(--gray-200);
+      color: var(--gray-700);
+      white-space: nowrap;
+    }
+    .btn-sm:hover { background: var(--gray-300); }
+
+    .btn-link {
+      background: none;
+      color: var(--blue);
+      padding: 4px 0;
+      font-size: 0.85rem;
+      text-decoration: underline;
+      font-weight: 500;
+    }
+
+    /* ── Info / Warning boxes ── */
+    .info-box, .warn-box, .tip-box {
+      border-radius: 8px;
+      padding: 11px 14px;
+      font-size: 0.855rem;
+      line-height: 1.55;
+      margin-bottom: 14px;
+    }
+    .info-box { background: var(--blue-bg); color: #1a4d72; border: 1px solid #b3d9f0; }
+    .warn-box { background: var(--yellow-bg); color: #7a5200; border: 1px solid var(--yellow-bd); }
+    .tip-box  { background: var(--gray-100); color: var(--gray-600); border: 1px solid var(--gray-300); }
+    .info-box a, .warn-box a, .tip-box a { color: inherit; text-decoration: underline; }
+
+    /* ── Sheet status pill ── */
+    .sheet-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 20px;
+      margin-bottom: 14px;
+    }
+    .sheet-status.ok    { background: var(--green-bg);  color: var(--green); }
+    .sheet-status.fail  { background: var(--red-bg);    color: var(--red);   }
+    .sheet-status.idle  { background: var(--gray-200);  color: var(--gray-600); }
+
+    /* ── Manual data collapsible ── */
+    .collapsible-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      user-select: none;
+      padding: 10px 14px;
+      border: 1.5px solid var(--gray-300);
+      border-radius: 8px;
+      background: var(--gray-100);
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--gray-700);
+      transition: background .15s;
+    }
+    .collapsible-header:hover { background: var(--gray-200); }
+    .collapsible-header .arrow { margin-left: auto; transition: transform .2s; }
+    .collapsible-header.open .arrow { transform: rotate(180deg); }
+    .collapsible-body {
+      border: 1.5px solid var(--gray-300);
+      border-top: none;
+      border-radius: 0 0 8px 8px;
+      padding: 16px;
+      display: none;
+    }
+    .collapsible-body.open { display: block; }
+
+    /* ── Prompt examples ── */
+    .examples { margin-top: 10px; }
+    .examples p.label { font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--gray-500); margin-bottom: 5px; }
+    .example-chip {
+      display: inline-block;
+      background: var(--blue-bg);
+      color: var(--blue-dark);
+      border: 1px solid #b3d9f0;
+      border-radius: 6px;
+      padding: 5px 10px;
+      font-size: 0.815rem;
+      margin: 3px 4px 3px 0;
+      cursor: pointer;
+      transition: background .15s;
+      font-style: italic;
+    }
+    .example-chip:hover { background: #d0eaf8; }
+
+    /* ── Generate button & status ── */
+    .generate-section { margin-top: 16px; }
+    .status-line {
+      margin-top: 10px;
+      min-height: 20px;
+      font-size: 0.855rem;
+      line-height: 1.4;
+    }
+    .status-line.loading { color: var(--blue); }
+    .status-line.error   { color: var(--red); white-space: pre-wrap; }
+    .status-line.success { color: var(--green); }
+
+    /* ── Result box ── */
+    .result-card { display: none; }
+    .result-card.visible { display: block; }
+
+    .result-box {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 18px;
+      border: 2px solid var(--gray-300);
+      border-radius: 10px;
+      background: var(--gray-100);
+      min-height: 58px;
+    }
+    .result-box.ok { border-color: var(--green-bd); background: var(--green-bg); }
+    .filename-text {
+      flex: 1;
+      font-family: 'Courier New', monospace;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--gray-900);
+      word-break: break-all;
+      letter-spacing: 0.02em;
+    }
+    .result-box.ok .filename-text { color: var(--green); }
+
+    .copy-btn {
+      background: var(--gray-200);
+      color: var(--gray-700);
+      padding: 8px 13px;
+      border-radius: 7px;
+      font-size: 0.82rem;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .copy-btn:hover { background: var(--gray-300); }
+    .copy-feedback {
+      font-size: 0.82rem;
+      color: var(--green);
+      margin-top: 7px;
+      min-height: 18px;
+    }
+
+    /* ── Format reference ── */
+    .format-ref {
+      font-family: 'Courier New', monospace;
+      font-size: 0.9rem;
+      background: var(--gray-100);
+      border: 1px solid var(--gray-300);
+      border-radius: 7px;
+      padding: 10px 14px;
+      color: var(--gray-700);
+      letter-spacing: 0.03em;
+      margin-bottom: 12px;
+    }
+    .format-ref span { color: var(--blue); font-weight: 700; }
+
+    /* ── Spinner ── */
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spinner {
+      display: inline-block;
+      width: 15px; height: 15px;
+      border: 2.5px solid rgba(255,255,255,.4);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+      vertical-align: middle;
+      margin-right: 7px;
+    }
+
+    /* ── Footer ── */
+    footer {
+      text-align: center;
+      color: var(--gray-500);
+      font-size: 0.78rem;
+      padding: 16px 0 24px;
+      line-height: 1.7;
+    }
+    footer a { color: var(--gray-500); }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Header -->
+  <header>
+    <div class="logo">🏗️</div>
+    <h1>MOLIO Filnavngenerator</h1>
+    <p>Generer standardiserede filnavne med ét dansk prompt — drevet af Claude AI</p>
+  </header>
+
+  <!-- ── Card 1: API Key ── -->
+  <div class="card">
+    <div class="card-title">Anthropic API Nøgle</div>
+    <div class="form-group">
+      <div class="input-row">
+        <input type="password" id="apiKey" placeholder="sk-ant-api03-..." autocomplete="off" />
+        <button class="btn-sm" onclick="toggleApiVis()" title="Vis/skjul nøgle">👁</button>
+        <button class="btn-sm" onclick="saveApiKey()">Gem</button>
+      </div>
+    </div>
+    <div class="tip-box">
+      Hent din nøgle på <a href="https://console.anthropic.com/settings/keys" target="_blank">console.anthropic.com</a>.
+      Nøglen gemmes <strong>kun i din browser</strong> (localStorage) og sendes direkte til Anthropic.
+    </div>
+  </div>
+
+  <!-- ── Card 2: Data Source ── -->
+  <div class="card">
+    <div class="card-title">Klassifikationsdata</div>
+
+    <div class="info-box">
+      <strong>📊 Google Sheet:</strong> Appen henter automatisk Fase-, Vidensområde- og Indholdstype-data
+      fra dit Google Sheet. Det kræver, at Sheet'et er delt som <em>"Alle med linket kan se"</em>.<br><br>
+      <a href="https://docs.google.com/spreadsheets/d/10_RXDUzxIhqbxmNgiuo5_1kpmf3UHgQk/edit" target="_blank">
+        ➡ Åbn Google Sheet
+      </a> &nbsp;·&nbsp;
+      Del → Skift til "Alle med linket" → Gem
+    </div>
+
+    <div id="sheetStatusPill" class="sheet-status idle">
+      ⬜ Data ikke hentet endnu
+    </div>
+
+    <button class="btn-sm" onclick="testSheetFetch()" style="margin-bottom:14px;">
+      🔄 Test forbindelse til Google Sheet
+    </button>
+
+    <!-- Manual fallback -->
+    <div class="collapsible-header" id="manualHeader" onclick="toggleManual()">
+      <span>📋 Indsæt data manuelt (hvis Sheet ikke er offentligt)</span>
+      <span class="arrow">▼</span>
+    </div>
+    <div class="collapsible-body" id="manualBody">
+      <p style="font-size:.85rem;color:var(--gray-600);margin-bottom:12px;">
+        Eksportér hver fane fra Google Sheets som CSV (Filer → Download → CSV) og indsæt indholdet nedenfor.
+      </p>
+      <div class="form-group">
+        <label>Fase (Phase) — CSV</label>
+        <textarea id="manualPhase" rows="4" placeholder="Indsæt CSV-indhold fra fanen 'Fase (Phase)' her..."></textarea>
+      </div>
+      <div class="form-group">
+        <label>Vidensområde — CSV</label>
+        <textarea id="manualKnowledge" rows="4" placeholder="Indsæt CSV-indhold fra fanen 'Vidensområde' her..."></textarea>
+      </div>
+      <div class="form-group">
+        <label>Indholdstype — CSV</label>
+        <textarea id="manualContent" rows="4" placeholder="Indsæt CSV-indhold fra fanen 'Indholdstype' her..."></textarea>
+      </div>
+      <button class="btn-sm" onclick="saveManualData()" style="margin-top:4px;">💾 Gem manuel data</button>
+    </div>
+  </div>
+
+  <!-- ── Card 3: Generator ── -->
+  <div class="card">
+    <div class="card-title">Generer Filnavn</div>
+
+    <div class="format-ref">
+      <span>PROJ</span>_<span>FASE</span>_<span>K##</span>_<span>C##.##</span>_<span>Z</span>dokumentnavn
+    </div>
+
+    <div class="form-group">
+      <label for="prompt">Din prompt på dansk</label>
+      <textarea id="prompt" rows="3"
+        placeholder='Eks: "Generer filnavn for en økonomiplan i projektet &quot;SPAR&quot; i projektforslagsfasen"'
+      ></textarea>
+    </div>
+
+    <div class="examples">
+      <p class="label">Klik for at udfylde et eksempel</p>
+      <span class="example-chip" onclick="fillExample(this)">Generer filnavn for en økonomiplan i projektet "SPAR" i projektforslagsfasen</span>
+      <span class="example-chip" onclick="fillExample(this)">Lav filnavn for en rammeaftale i projektet "SPAR" i udbudprojektfasen</span>
+      <span class="example-chip" onclick="fillExample(this)">Filnavn til organisationsdiagram i projekt "SPIR" i projektforslagsfasen</span>
+    </div>
+
+    <div class="generate-section">
+      <button class="btn-primary" id="generateBtn" onclick="generate()">
+        Generer filnavn
+      </button>
+      <div class="status-line" id="statusLine"></div>
+    </div>
+  </div>
+
+  <!-- ── Card 4: Result ── -->
+  <div class="card result-card" id="resultCard">
+    <div class="card-title">Resultat</div>
+    <div class="result-box" id="resultBox">
+      <span class="filename-text" id="filenameText"></span>
+      <button class="copy-btn" onclick="copyResult()">📋 Kopier</button>
+    </div>
+    <div class="copy-feedback" id="copyFeedback"></div>
+  </div>
+
+  <footer>
+    MOLIO Filnavngenerator &nbsp;·&nbsp; Drevet af <a href="https://anthropic.com" target="_blank">Anthropic Claude</a><br>
+    Filnavneformat følger MOLIO klassifikationsstandard
+  </footer>
+
+</div><!-- /container -->
+
+<script>
+// ─────────────────────────────────────────────
+// Constants
+// ─────────────────────────────────────────────
+const SHEET_ID = '10_RXDUzxIhqbxmNgiuo5_1kpmf3UHgQk';
+const SHEET_NAMES = ['Fase (Phase)', 'Vidensområde', 'Indholdstype'];
+const CACHE_KEY = 'molio_sheet_cache';
+const CACHE_TTL = 60 * 60 * 1000; // 1 hour
+
+// ─────────────────────────────────────────────
+// Init
+// ─────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  const savedKey = localStorage.getItem('anthropic_api_key');
+  if (savedKey) document.getElementById('apiKey').value = savedKey;
+
+  const savedPhase = localStorage.getItem('manual_phase');
+  const savedKnowledge = localStorage.getItem('manual_knowledge');
+  const savedContent = localStorage.getItem('manual_content');
+  if (savedPhase)    document.getElementById('manualPhase').value    = savedPhase;
+  if (savedKnowledge) document.getElementById('manualKnowledge').value = savedKnowledge;
+  if (savedContent)  document.getElementById('manualContent').value  = savedContent;
+
+  // If we have cached sheet data, show it
+  const cached = getCachedSheetData();
+  if (cached) setSheetStatus('ok', '✅ Data klar (fra cache)');
+});
+
+// ─────────────────────────────────────────────
+// API Key helpers
+// ─────────────────────────────────────────────
+function saveApiKey() {
+  const k = document.getElementById('apiKey').value.trim();
+  if (!k) { alert('Indtast venligst en API-nøgle.'); return; }
+  localStorage.setItem('anthropic_api_key', k);
+  setStatus('✅ API-nøgle gemt', 'success');
+  setTimeout(() => setStatus('', ''), 2000);
+}
+
+function toggleApiVis() {
+  const el = document.getElementById('apiKey');
+  el.type = el.type === 'password' ? 'text' : 'password';
+}
+
+// ─────────────────────────────────────────────
+// Sheet data: fetch & cache
+// ─────────────────────────────────────────────
+function sheetCSVUrl(name) {
+  return `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(name)}`;
+}
+
+async function fetchOneSheet(name) {
+  const resp = await fetch(sheetCSVUrl(name));
+  if (!resp.ok) throw new Error(`HTTP ${resp.status} for "${name}"`);
+  const txt = await resp.text();
+  if (txt.trim().startsWith('<!') || txt.trim().toLowerCase().startsWith('<html')) {
+    throw new Error(`Fanen "${name}" er ikke tilgængeligt (sheet er ikke offentligt?)`);
+  }
+  if (txt.trim().length < 5) throw new Error(`Tom respons for "${name}"`);
+  return txt;
+}
+
+async function fetchAllSheets() {
+  const [phase, knowledge, content] = await Promise.all(
+    SHEET_NAMES.map(n => fetchOneSheet(n))
+  );
+  return { phase, knowledge, content, ts: Date.now() };
+}
+
+function getCachedSheetData() {
+  try {
+    const raw = localStorage.getItem(CACHE_KEY);
+    if (!raw) return null;
+    const obj = JSON.parse(raw);
+    if (Date.now() - obj.ts > CACHE_TTL) return null;
+    return obj;
+  } catch { return null; }
+}
+
+function cacheSheetData(data) {
+  localStorage.setItem(CACHE_KEY, JSON.stringify(data));
+}
+
+async function testSheetFetch() {
+  setSheetStatus('idle', '⏳ Henter data fra Google Sheet...');
+  try {
+    const data = await fetchAllSheets();
+    cacheSheetData(data);
+    setSheetStatus('ok', '✅ Forbundet! Data hentet fra alle 3 faner.');
+  } catch (err) {
+    setSheetStatus('fail', '❌ Fejl: ' + err.message);
+  }
+}
+
+function setSheetStatus(type, msg) {
+  const el = document.getElementById('sheetStatusPill');
+  el.className = 'sheet-status ' + type;
+  el.textContent = msg;
+}
+
+// ─────────────────────────────────────────────
+// Manual data helpers
+// ─────────────────────────────────────────────
+function toggleManual() {
+  const header = document.getElementById('manualHeader');
+  const body   = document.getElementById('manualBody');
+  header.classList.toggle('open');
+  body.classList.toggle('open');
+}
+
+function saveManualData() {
+  localStorage.setItem('manual_phase',    document.getElementById('manualPhase').value);
+  localStorage.setItem('manual_knowledge', document.getElementById('manualKnowledge').value);
+  localStorage.setItem('manual_content',  document.getElementById('manualContent').value);
+  // Clear cache so manual data is used
+  localStorage.removeItem(CACHE_KEY);
+  setStatus('✅ Manuel data gemt', 'success');
+  setTimeout(() => setStatus('', ''), 2000);
+}
+
+function getManualData() {
+  const phase    = document.getElementById('manualPhase').value.trim();
+  const knowledge = document.getElementById('manualKnowledge').value.trim();
+  const content  = document.getElementById('manualContent').value.trim();
+  if (phase || knowledge || content) return { phase, knowledge, content };
+  return null;
+}
+
+// ─────────────────────────────────────────────
+// Get sheet data (cache → Google → manual)
+// ─────────────────────────────────────────────
+async function getSheetData() {
+  // 1. Cached Google Sheets data
+  const cached = getCachedSheetData();
+  if (cached && cached.phase && cached.knowledge && cached.content) {
+    return { ...cached, source: 'cache' };
+  }
+
+  // 2. Try fetching from Google Sheets live
+  try {
+    setStatus('⏳ Henter klassifikationsdata fra Google Sheets…', 'loading');
+    const data = await fetchAllSheets();
+    cacheSheetData(data);
+    setSheetStatus('ok', '✅ Data klar (Google Sheets)');
+    return { ...data, source: 'google' };
+  } catch (fetchErr) {
+    // 3. Fall back to manual data
+    const manual = getManualData();
+    if (manual && manual.phase && manual.knowledge && manual.content) {
+      return { ...manual, source: 'manual' };
+    }
+    // Nothing works
+    throw new Error(
+      `Kunne ikke hente Google Sheet-data: ${fetchErr.message}\n\n` +
+      `Løsninger:\n` +
+      `• Gør Google Sheet offentligt (Del → Alle med linket kan se)\n` +
+      `• Klik "Test forbindelse til Google Sheet"\n` +
+      `• Eller indsæt CSV-data manuelt i sektionen ovenfor`
+    );
+  }
+}
+
+// ─────────────────────────────────────────────
+// Build system prompt
+// ─────────────────────────────────────────────
+function buildSystemPrompt(data) {
+  return `Du er en assistent der genererer præcise, standardiserede filnavne til bygge- og anlægsprojekter baseret på MOLIO's klassifikationssystem.
+
+## Filnavnformat
+\`\`\`
+{PROJEKT}_{FASE}_{VIDENSOMRÅDE}_{INDHOLDSTYPE}_{Z-DOKUMENTNAVN}
+\`\`\`
+
+## Regler
+1. **PROJEKT** – Op til 4 tegn, STORE BOGSTAVER. Udled fra projektnavn i prompten (brug de første 4 tegn eller en naturlig forkortelse).
+2. **FASE** – 2-tegns kode fra Fase-tabellen nedenfor (match fasebeskrivelsen fra prompten).
+3. **VIDENSOMRÅDE** – Kode med format K## (fra Vidensområde-tabellen). Vælg det vidensområde der bedst passer til dokumenttypen.
+4. **INDHOLDSTYPE** – Kode med format C##.## (fra Indholdstype-tabellen). Vælg den indholdstype der bedst beskriver dokumentet.
+5. **Z-DOKUMENTNAVN** – Starter ALTID med stort Z, efterfulgt af et kort, beskrivende dansk navn. Ingen mellemrum (brug bindestreg hvis nødvendigt). Brug den dokumenttype der nævnes i prompten.
+
+## Klassifikationsdata
+
+### FASE (Phase)
+\`\`\`csv
+${data.phase || '(ingen data)'}
+\`\`\`
+
+### VIDENSOMRÅDE
+\`\`\`csv
+${data.knowledge || '(ingen data)'}
+\`\`\`
+
+### INDHOLDSTYPE
+\`\`\`csv
+${data.content || '(ingen data)'}
+\`\`\`
+
+## Eksempler på korrekte filnavne
+- SPAR_A4_K14_C03.04_Zøkonomiplan
+- SPAR_A6_K15_C02.05_Zrammeaftale
+- SPIR_A4_K00_C11.02_Zaftalt-hovedtidsplan
+- SPIR_A4_K01_C01.02_Zorganisationsdiagram
+- SPIR_A4_K01_C02.06_Zprojektjournal
+
+## Instruktion
+Svar KUN med det genererede filnavn — ingen forklaring, ingen punkter, ingen ekstra tekst.
+Hvis der mangler data i tabellerne, lav et kvalificeret gæt baseret på mønstret fra eksemplerne.`;
+}
+
+// ─────────────────────────────────────────────
+// Main generate function
+// ─────────────────────────────────────────────
+async function generate() {
+  const apiKey = document.getElementById('apiKey').value.trim();
+  const prompt  = document.getElementById('prompt').value.trim();
+
+  if (!apiKey) { setStatus('❌ Indtast din Anthropic API-nøgle øverst', 'error'); return; }
+  if (!prompt)  { setStatus('❌ Skriv en prompt', 'error'); return; }
+
+  localStorage.setItem('anthropic_api_key', apiKey);
+
+  const btn = document.getElementById('generateBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Genererer…';
+  document.getElementById('resultCard').classList.remove('visible');
+
+  try {
+    const sheetData = await getSheetData();
+
+    setStatus('⏳ Spørger Claude AI…', 'loading');
+
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-opus-4-6',
+        max_tokens: 256,
+        system: buildSystemPrompt(sheetData),
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    if (!resp.ok) {
+      const err = await resp.json().catch(() => ({}));
+      throw new Error(err.error?.message || `API-fejl ${resp.status}`);
+    }
+
+    const apiData = await resp.json();
+    const filename = apiData.content?.[0]?.text?.trim();
+
+    if (!filename) throw new Error('Tom respons fra Claude');
+
+    showResult(filename);
+    setStatus('', '');
+
+  } catch (err) {
+    setStatus('❌ ' + err.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = 'Generer filnavn';
+  }
+}
+
+// ─────────────────────────────────────────────
+// UI helpers
+// ─────────────────────────────────────────────
+function setStatus(msg, type) {
+  const el = document.getElementById('statusLine');
+  el.textContent = msg;
+  el.className = 'status-line ' + (type || '');
+}
+
+function showResult(filename) {
+  const card = document.getElementById('resultCard');
+  const box  = document.getElementById('resultBox');
+  const text = document.getElementById('filenameText');
+
+  text.textContent = filename;
+  const isValid = /^[A-Z0-9]{2,6}_[A-Z]\d+_K\d+_C\d+\.\d+_Z.+$/.test(filename);
+  box.className = 'result-box' + (isValid ? ' ok' : '');
+  card.classList.add('visible');
+  document.getElementById('copyFeedback').textContent = '';
+
+  card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function copyResult() {
+  const text = document.getElementById('filenameText').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const fb = document.getElementById('copyFeedback');
+    fb.textContent = '✅ Kopieret til udklipsholder!';
+    setTimeout(() => { fb.textContent = ''; }, 2500);
+  });
+}
+
+function fillExample(el) {
+  document.getElementById('prompt').value = el.textContent.trim();
+  document.getElementById('prompt').focus();
+}
+</script>
+</body>
+</html>
