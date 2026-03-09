@@ -40,7 +40,7 @@ jobs:
           grep -n 'ANTHROPIC_API_KEY' index.html
           python3 -c "import os; k=os.environ['ANTHROPIC_API_KEY']; print('Key length:', len(k)); c=open('index.html').read(); replaced=c.replace('%%ANTHROPIC_API_KEY%%',k); open('index.html','w').write(replaced); print('Placeholder count after:', replaced.count('%%ANTHROPIC_API_KEY%%'))"
           echo "=== After injection ==="
-          grep -n 'ANTHROPIC_API_KEY' index.html
+          grep -n 'ANTHROPIC_API_KEY' index.html || echo "(placeholder removed successfully)"
 
       - uses: actions/configure-pages@v5
 
