@@ -27,16 +27,7 @@ jobs:
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
-          python3 -c "
-import os
-key = os.environ['ANTHROPIC_API_KEY']
-with open('index.html', 'r') as f:
-    content = f.read()
-content = content.replace('%%ANTHROPIC_API_KEY%%', key)
-with open('index.html', 'w') as f:
-    f.write(content)
-print('Injection result:', '%%ANTHROPIC_API_KEY%%' not in content)
-"
+          python3 -c "import os; k=os.environ['ANTHROPIC_API_KEY']; c=open('index.html').read(); open('index.html','w').write(c.replace('%%ANTHROPIC_API_KEY%%',k)); print('Injection ok:', '%%ANTHROPIC_API_KEY%%' not in c)"
 
       - uses: actions/configure-pages@v5
 
